@@ -1,11 +1,10 @@
-## My Project
+## App Modernization Partners Serverless Demos
 
-TODO: Fill this README out!
+This is a repository to show a set of demo projects showcasing various Serverless patterns using AWS Serverless services. 
 
-Be sure to:
+Please see the following list for the demos you can test:
 
-* Change the title in this README
-* Edit your repository description on GitHub
+- [Event-driven Architecture on AWS](/aws-eda-demo/README.md)
 
 ## Security
 
