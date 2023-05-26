@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Java Calculator
+Resources:
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: java-calculator
+      CodeUri: .
+      Handler: example.Calculator
+      Runtime: java11
+      Description: Java function
+      MemorySize: 512
+      Timeout: 30
+      Policies:
+        - AWSLambdaBasicExecutionRole
