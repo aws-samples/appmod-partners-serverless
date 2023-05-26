@@ -4,7 +4,7 @@ This is a repository to show a set of demo projects showcasing various Serverles
 
 Please see the following list for the demos you can test:
 
-- [Event-driven Architecture on AWS](/aws-eda-demo/README.md)
+- [Event-driven Architecture on AWS](event-driven-architecture/README.md)
 
 ## Security
 
