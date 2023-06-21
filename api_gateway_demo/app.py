@@ -3,7 +3,7 @@ import os
 
 import aws_cdk as cdk
 
-from api_gateway_demo.api_gateway_demo_stack import ApiGatewayDemoStack
+from api_gateway_demo_stack import ApiGatewayDemoStack
 
 
 app = cdk.App()

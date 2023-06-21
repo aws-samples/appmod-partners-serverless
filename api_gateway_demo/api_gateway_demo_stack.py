@@ -18,7 +18,7 @@ class ApiGatewayDemoStack(Stack):
         api_books_lambda = lambda_.Function(
             self, "api_books_lambda",
             runtime=lambda_.Runtime.PYTHON_3_9,
-            code=lambda_.Code.from_asset('api_gateway_demo/lambda/'),
+            code=lambda_.Code.from_asset('lambda/'),
             handler="api_books_lambda.lambda_handler",
             tracing=lambda_.Tracing.ACTIVE
         )
