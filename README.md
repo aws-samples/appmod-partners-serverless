@@ -6,6 +6,7 @@ Please see the following list for the demos you can test:
 
 - [Event-driven Architecture on AWS](event-driven-architecture/README.md)
 - [Java on AWS Lambda](lambda-java-calculator/README.md)
+- [Api Gateway](api-gateway-demo/README.md)
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
