@@ -8,7 +8,7 @@ This demo project exemplifies a Books REST API with serverless services, such as
   - Get Books: The Api Gateway triggers the AWS Lambda function and runs a query on the DynamoDB book table to get all books.
 
 ## Reference Architecture
-![Reference Architecture](api_gateway_demo/resources/api-gateway-demo.png)
+![Reference Architecture](resources/api-gateway-demo.png)
 
 # Requirement
 
@@ -74,7 +74,7 @@ https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html
 
 9. To test your POST method you can use the API test console, curl, app postman or another app of your choice
 - You need to put the header Authorization and the IdToken you you got on step 8
-(api_gateway_demo/resources/authorizer-postman.png)
+(resources/authorizer-postman.png)
 
 - To the body you can use this example 
     ```json
@@ -97,7 +97,7 @@ https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html
         }}
     ```
 10. Test your GET method again and the return must be like this
-(api_gateway_demo/resources/get-api-postman.png)
+(resources/get-api-postman.png)
 
 11. Go to x-ray to see your API service map
 
