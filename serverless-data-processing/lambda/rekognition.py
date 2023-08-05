@@ -10,7 +10,6 @@ from botocore.exceptions import ClientError
 logger = logging.getLogger(__name__)
 
 # Get the table name from the environment
-db = environ['TABLE_NAME']
 bucket_name = environ['BUCKET_NAME']
 
 # Get the boto3 client.

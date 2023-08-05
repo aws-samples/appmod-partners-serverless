@@ -1,14 +1,38 @@
-# Welcome to your CDK TypeScript project
+# Serverless Data Processing
+This project demonstrates an example pattern for data processing using Serverless compute and integration services.
 
-This is a blank project for CDK development with TypeScript.
+- **Books Application** is implemented with these features
+  - Create Book: The Api Gateway receives the request with the authorization token and the new book information in the body, calls a lambda function, and maintains it in Amazon DynamoDB
+  - Get Books: The Api Gateway triggers the AWS Lambda function and runs a query on the DynamoDB book table to get all books.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+## Reference Architecture
+![Reference Architecture](resources/api-gateway-demo.png)
 
-## Useful commands
+# Requirement
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+https://docs.aws.amazon.com/cdk/v2/guide/work-with-cdk-python.html
+
+# Project Deployment
+
+## Project Deployment
+1. Clone the repository
+    ```bash
+    git clone https://github.com/aws-samples/appmod-partners-serverless
+    ```
+2. Access the directory
+    ```bash
+    cd serverless-data-processing
+    ```
+3. Export to the following variables in your terminal:
+    S3_BUCKET_NAME = Name of the S3 bucket which has your image files.
+    DYNAMODB_TABLE_NAME = Name of the DynamoDB table that will be created to record data.
+
+    ```bash
+    export S3_BUCKET_NAME='youngj-image-dataset-bucket'
+    export DYNAMODB_TABLE_NAME='serverless-data-processing-table'
+    ```
+4. Run the CDK commands to deploy the infrastructure with the Lambda functions:
+    ```bash
+    cdk synth
+    cdk deploy
+    ```

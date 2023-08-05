@@ -35,7 +35,6 @@ export class ServerlessDataProcessingStack extends cdk.Stack {
       code: lambda.Code.fromAsset('lambda'),
       handler: 'rekognition.lambda_handler',
       environment: {
-        'TABLE_NAME': props.tableName,
         'BUCKET_NAME': bucket.bucketName
       }
     }); 
