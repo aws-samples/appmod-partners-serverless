@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 
 # Get the table name from the environment
 db = environ['TABLE_NAME']
-bucket_name = environ['BUCKET_NAME']
 
 # Get the boto3 client.
 ddb = boto3.resource('dynamodb')
@@ -20,11 +19,12 @@ table = ddb.Table(db)
 
 def lambda_handler(event, context):
     try:
-
         # Save the name and label
-        if 'Name' and 'Labels' in event:
-            id = event['Name']
-            data = json.loads(json.dumps(event['Labels']), parse_float=Decimal)
+        body = event['body']
+        print(body)
+        if 'Name' and 'Labels' in body:
+            id = body['Name']
+            data = json.loads(json.dumps(body['Labels']), parse_float=Decimal)
             
         else:
             raise ValueError(

@@ -1,8 +1,6 @@
 import boto3
-import json
 import logging
 from os import environ
-import base64
 
 from botocore.exceptions import ClientError
 
@@ -15,19 +13,11 @@ bucket_name = environ['BUCKET_NAME']
 # Get the boto3 client.
 rek_client = boto3.client('rekognition', region_name="us-west-2")
 
-
 def lambda_handler(event, context):
+
     try:
-
         # Determine image source.
-        if 'image' in event:
-            # Decode the image
-            image_bytes = event['image'].encode('utf-8')
-            img_b64decoded = base64.b64decode(image_bytes)
-            image = {'Bytes': img_b64decoded}
-
-
-        elif 'S3Object' in event:
+        if 'S3Object' in event:
             image = {
                 'S3Object':
                 {
@@ -41,12 +31,12 @@ def lambda_handler(event, context):
                 'Invalid source. Only image base 64 encoded image bytes or S3Object are supported.')
 
 
-        # Analyze the image.
+        # Detect Top 2 labels from the image.
         response = rek_client.detect_labels(Image=image,
             MaxLabels=2,
             MinConfidence=80)
 
-        # Get the custom labels and extract values
+        # Extract value
         labels = response['Labels']
         name = event['S3Object']['Name']
         values = {label['Name']: label['Confidence'] for label in labels}
@@ -59,7 +49,7 @@ def lambda_handler(event, context):
 
         lambda_response = {
             "statusCode": 200,
-            "body": json.dumps(payload)
+            "body": payload
         }
 
     except ClientError as err:
