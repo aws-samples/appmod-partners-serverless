@@ -33,7 +33,7 @@ def lambda_handler(event, context):
 
         # Detect Top 2 labels from the image.
         response = rek_client.detect_labels(Image=image,
-            MaxLabels=2,
+            MaxLabels=1,
             MinConfidence=80)
 
         # Extract value

@@ -22,9 +22,12 @@ def lambda_handler(event, context):
         # Save the name and label
         body = event['body']
         print(body)
-        if 'Name' and 'Labels' in body:
+        if 'Name' in body:
             id = body['Name']
-            data = json.loads(json.dumps(body['Labels']), parse_float=Decimal)
+            if 'Labels' in body:
+                data = json.loads(json.dumps(body['Labels']), parse_float=Decimal)
+            else:
+                raise ValueError('The labels must be included.')
             
         else:
             raise ValueError(
@@ -34,14 +37,12 @@ def lambda_handler(event, context):
         response = table.put_item(
             Item={
                 'id': id,
-                'label1': data.popitem(),
-                'label2': data.popitem()
+                'label': data.popitem(),
             }
         )
 
         lambda_response = {
             "statusCode": 200,
-            "body": json.dumps(response)
         }
 
     except ClientError as err:
@@ -50,10 +51,7 @@ def lambda_handler(event, context):
 
         lambda_response = {
             'statusCode': 400,
-            'body': {
-                "Error": err.response['Error']['Code'],
-                "ErrorMessage": error_message
-            }
+            'error': error_message
         }
         logger.error("Error function %s: %s",
             context.invoked_function_arn, error_message)
@@ -61,12 +59,19 @@ def lambda_handler(event, context):
     except ValueError as val_error:
         lambda_response = {
             'statusCode': 400,
-            'body': {
-                "Error": "ValueError",
-                "ErrorMessage": format(val_error)
-            }
+            'name': event['body'],
+            'error': format(val_error)
         }
         logger.error("Error function %s: %s",
             context.invoked_function_arn, format(val_error))
+        
+    except KeyError as key_error:
+        lambda_response = {
+            'statusCode': 400,
+            'name': event['body'],
+            'error': format(key_error)
+        }
+        logger.error("Error function %s: %s",
+            context.invoked_function_arn, format(key_error))
 
     return lambda_response
