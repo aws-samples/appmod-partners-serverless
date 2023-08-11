@@ -39,7 +39,7 @@ Using [Step Functions Distributed Maps](https://docs.aws.amazon.com/step-functio
     cdk deploy ServerlessDataProcessingStack
     ```
 
-5. One of the CloudFormation Output is called "DMapEventBusConsoleUrl". Access that website on your browser (it will be in the form of: "https://<your-region>.console.aws.amazon.com/events/home?region=<your-region>#/eventbus/<name-of-your-event-bus>")
+5. One of the CloudFormation Output is called "DMapEventBusConsoleUrl". Access that website on your browser (it will be in the form of: "https://your-region.console.aws.amazon.com/events/home?region=your-region#/eventbus/name-of-your-event-bus")
 
 6. Click "Send events" and provide the following:
 
@@ -55,4 +55,4 @@ Event Detail: (if your images are in the main S3 bucket, provide "" for the Pref
 }
 ```
 
-7. You will now be able to access the Distributed Map State Machine, by accessing the console URL from the CDK output called "DMapEventBusConsoleUrl". It will be in the form of: "https://<your-region>.console.aws.amazon.com/states/home?region=<your-region>#/eventbus/view/<arn-of-your-states-machine>"). Open the console to look at the execution in details.
+7. You will now be able to access the Distributed Map State Machine, by accessing the console URL from the CDK output called "DMapEventBusConsoleUrl". It will be in the form of: "https://your-region.console.aws.amazon.com/states/home?region=your-region#/eventbus/view/arn-of-your-states-machine"). Open the console to look at the execution in details.
