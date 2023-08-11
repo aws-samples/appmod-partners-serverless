@@ -9,7 +9,7 @@ import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Role, PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
-export interface DistributedMapStackProps extends cdk.StackProps {
+export interface DistributedMapStackProps extends cdk.NestedStackProps {
     labelLambda: lambda.Function;
     recordLambda: lambda.Function;
     dataBucket: s3.IBucket;
@@ -19,9 +19,12 @@ export interface DistributedMapStackProps extends cdk.StackProps {
         maxConcurrency: number;
         toleratedFailurePercentage: number;
     };
+    maxItems: number;
 }
 
-export class DistributedMapStack extends cdk.Stack {
+export class DistributedMapStack extends cdk.NestedStack {
+    private dMapStateMachine: sfn.StateMachine;
+
     constructor(scope: Construct, id: string, props: DistributedMapStackProps) {
         super(scope, id, props);
 
@@ -101,15 +104,13 @@ export class DistributedMapStack extends cdk.Stack {
                                 Parameters: {
                                     FunctionName: `${props.labelLambda.functionArn}:$LATEST`,
                                     Payload: {
-                                        S3Object: {
-                                            'Bucket.$': '$.Bucket',
-                                            'Name.$': '$.Name',
-                                        },
+                                        'items.$': '$.Items',
                                     },
                                 },
                                 Retry: [
                                     {
                                         ErrorEquals: [
+                                            'States.TaskFailed',
                                             'Lambda.ServiceException',
                                             'Lambda.AWSLambdaException',
                                             'Lambda.SdkClientException',
@@ -159,6 +160,9 @@ export class DistributedMapStack extends cdk.Stack {
                         'Bucket.$': '$$.Execution.Input.myStateInput.Bucket',
                         'Name.$': '$$.Map.Item.Value.Key',
                     },
+                    ItemBatcher: {
+                        MaxItemsPerBatch: props.maxItems,
+                    },
                     ResultWriter: {
                         Resource: 'arn:aws:states:::s3:putObject',
                         Parameters: {
@@ -172,37 +176,22 @@ export class DistributedMapStack extends cdk.Stack {
             }
         );
 
-        const dMapStateMachine = new sfn.StateMachine(
-            this,
-            'DMapStateMachine',
-            {
-                definitionBody:
-                    sfn.DefinitionBody.fromChainable(distributedMap),
-                role: stateMachineRole,
-                tracingEnabled: true,
-                logs: {
-                    destination: new LogGroup(
-                        this,
-                        'DMapStateMachineLogGroup',
-                        {
-                            logGroupName: '/aws/lambda/DMapStateMachine',
-                            retention: RetentionDays.ONE_MONTH,
-                            removalPolicy: cdk.RemovalPolicy.DESTROY,
-                        }
-                    ),
-                    level: sfn.LogLevel.ALL,
-                },
-            }
-        );
-
-        new cdk.CfnOutput(this, 'DMapStateMachineArnOutput', {
-            description: 'ARN of the State Machine',
-            value: dMapStateMachine.stateMachineArn,
+        this.dMapStateMachine = new sfn.StateMachine(this, 'DMapStateMachine', {
+            definitionBody: sfn.DefinitionBody.fromChainable(distributedMap),
+            role: stateMachineRole,
+            tracingEnabled: true,
+            logs: {
+                destination: new LogGroup(this, 'DMapStateMachineLogGroup', {
+                    logGroupName: '/aws/lambda/DMapStateMachine',
+                    retention: RetentionDays.ONE_MONTH,
+                    removalPolicy: cdk.RemovalPolicy.DESTROY,
+                }),
+                level: sfn.LogLevel.ALL,
+            },
         });
+    }
 
-        new cdk.CfnOutput(this, 'DMapStateMachineConsoleUrl', {
-            description: 'State Machine Console URL',
-            value: `https://${process.env.CDK_DEFAULT_REGION}.console.aws.amazon.com/states/home?region=${process.env.CDK_DEFAULT_REGION}#/statemachines/view/${dMapStateMachine.stateMachineArn}`
-        });
+    getStateMachine(): sfn.StateMachine {
+        return this.dMapStateMachine;
     }
 }

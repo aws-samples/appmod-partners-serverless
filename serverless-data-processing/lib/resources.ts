@@ -4,15 +4,18 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 
-export interface ResourcesStackProps extends cdk.StackProps {
+export interface ResourcesStackProps extends cdk.NestedStackProps {
     // Name of the DynamoDB table to create
     tableName: string;
 
     // Name of the existing S3 bucket to read from
     dataBucketName: string;
+
+    // Maximum number of items to process in a batch
+    maxItems: number;
 }
 
-export class ResourcesStack extends cdk.Stack {
+export class ResourcesStack extends cdk.NestedStack {
     private labelLambda: lambda.Function;
     private recordLambda: lambda.Function;
     private dataBucket: s3.IBucket;
@@ -33,16 +36,20 @@ export class ResourcesStack extends cdk.Stack {
         this.executionOutputBucket = new s3.Bucket(
             this,
             'ExecutionOutputBucket',
-            {}
+            {
+                removalPolicy: cdk.RemovalPolicy.DESTROY,
+            }
         );
 
         // Define a new DynamoDB table
         this.table = new dynamodb.Table(this, 'Table', {
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
             partitionKey: {
                 name: 'id',
                 type: dynamodb.AttributeType.STRING,
             },
             tableName: props.tableName,
+            writeCapacity: 300 * props.maxItems,
         });
 
         // Define a new Lambda function
@@ -51,7 +58,7 @@ export class ResourcesStack extends cdk.Stack {
             code: lambda.Code.fromAsset('lambda'),
             handler: 'rekognition.lambda_handler',
             memorySize: 1024,
-            timeout: cdk.Duration.seconds(30),
+            timeout: cdk.Duration.seconds(5 * props.maxItems),
             environment: {
                 BUCKET_NAME: this.dataBucket.bucketName,
             },
@@ -82,7 +89,7 @@ export class ResourcesStack extends cdk.Stack {
             code: lambda.Code.fromAsset('lambda'),
             handler: 'ddb.lambda_handler',
             memorySize: 256,
-            timeout: cdk.Duration.seconds(30),
+            timeout: cdk.Duration.seconds(5 * props.maxItems),
             environment: {
                 TABLE_NAME: props.tableName,
             },
