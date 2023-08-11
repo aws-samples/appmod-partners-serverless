@@ -21,26 +21,36 @@ def lambda_handler(event, context):
     try:
         # Save the name and label
         body = event['body']
-        print(body)
-        if 'Name' in body:
-            id = body['Name']
-            if 'Labels' in body:
-                data = json.loads(json.dumps(body['Labels']), parse_float=Decimal)
+
+        data = []
+        for image in body:
+            print(image)
+            if 'Name' in image:
+                id = image['Name']
+                if 'Labels' in image:
+                    labelData = json.loads(json.dumps(image['Labels']), parse_float=Decimal)
+                    item = {
+                        'id': id,
+                        'labels': labelData.popitem()
+                    }
+                    print(item)
+                    data.append(item)
+                else:
+                    raise ValueError('The labels must be included.')
+                
             else:
-                raise ValueError('The labels must be included.')
+                raise ValueError('Invalid source. The name must be included.')
             
-        else:
-            raise ValueError(
-                'Invalid source. The name must be included.')
-
+        print(data)
         # Input the data to DynamoDB
-        response = table.put_item(
-            Item={
-                'id': id,
-                'label': data.popitem(),
-            }
-        )
-
+        responses = []
+        for item in data:
+            response = table.put_item(
+                Item=item
+            )
+            responses.append(response)
+            
+        print(responses)
         lambda_response = {
             "statusCode": 200,
         }
