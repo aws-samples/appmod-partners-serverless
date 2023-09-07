@@ -1,6 +1,8 @@
 # Lambda Extensions Demo
 
-This is a demo of the logging functionality available with [AWS Lambda](https://aws.amazon.com/lambda/) Extensions to send logs directly from Lambda to [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/).
+This is a demo of a sample logging functionality available with [AWS Lambda](https://aws.amazon.com/lambda/) Extensions to send logs directly from Lambda to [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3/).
+
+Using AWS Lambda Extensions, you can get granular insights into your Lambda function's performance and receive log streams directly from within the Lambda execution environment, making it easier to perform diagnostics and troubleshooting. In this example, you will attach a Lambda extension delivered as a layer to your sample Lambda function. The example creates two S3 buckets to store the logs, one to store only function errors and another to store all other logs. This allows you to query and troubleshoot all your function errors from a dedicated S3 bucket. You can configure SNS on the S3 bucket to receive notifications.
 
 For more information on the extensions logs functionality, see the blog post [Using AWS Lambda extensions to send logs to custom destinations](https://aws.amazon.com/blogs/compute/using-aws-lambda-extensions-to-send-logs-to-custom-destinations/)
 
@@ -8,54 +10,46 @@ For more information on the extensions logs functionality, see the blog post [Us
 
 ![Reference Architecture](images/lambda-extensions-demo.png)
 
-This example packages the extension and function as zip archives. See the s3-logs-extension-demo-container-image version to use the functionality with container images.
-
-> This is a simple example extension to help you start investigating the Lambda Runtime Logs API. This code is not production ready, and it has never intended to be. Use it with your own discretion after testing thoroughly.  
-
-The demo includes a Lambda function with an extension delivered as a Lambda Layer.
-
-The extension uses the Extensions API to register for INVOKE and SHUTDOWN events. The extension, using the Logs API, then subscribes to receive platform and function logs, but not extension logs. The extension runs a local HTTP endpoint listening for HTTP POST events. Lambda delivers log batches to this endpoint. The code can be amended (see the comments) to handle each log record in the batch. This can be used to process, filter, and route individual log records to any preferred destination
-
-The example creates an S3 bucket to store the logs. A Lambda function is configured with an environment variable to specify the S3 bucket name. Lambda streams the logs to the extension. The extension copies the logs to the S3 bucket.
-
-The extension uses the Python runtime from the execution environment to show the functionality. The recommended best practice is to compile your extension into an executable binary and not rely on the runtime.
-
-The demo deploys all components together using the [AWS Serverless Application Model (AWS SAM)](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-
 ## Requirements
 
 * [AWS SAM CLI ](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - **minimum version 0.48**.
 
-## Installation instructions
+## Project Deployment
 
 1. [Create an AWS account](https://portal.aws.amazon.com/gp/aws/developer/registration/index.html) if you do not already have one and login.
 
 2. Clone the repo onto your local development machine:
 ```bash
-git clone https://github.com/aws-samples/aws-lambda-extensions
-cd s3-logs-extension-demo-zip-archive
+git clone https://github.com/aws-samples/appmod-partners-serverless
 ```
 
-1. Run the following command for AWS SAM to deploy the components as specified in the `template.yml` file:
+3. Access the directory 
+```bash
+cd lambda-extensions-demo
+```
+
+4. Run the following command for AWS SAM to deploy the components as specified in the `template.yml` file:
 ```bash
 sam build
 # If you receive build errors or don't have 'Python' or 'make' installed, you can use the option to build using a container which uses a python3.8 Docker container image.  
 # sam build --use-container
-sam deploy --stack-name s3-logs-extension-demo --guided
+sam deploy --stack-name lambda-extensions-demo --guided
 ```
 
-During the prompts:
+5. During the prompts:
 
-* Accept the default Stack Name `s3-logs-extension-demo`.
+* Accept the default Stack Name `lambda-extension-demo`.
 * Enter your preferred Region
 * Accept the defaults for the remaining questions.
 
 AWS SAM deploys the application stack which includes the Lambda function and an IAM Role. AWS SAM creates a layer for the runtime, a layer for the extension, and adds them to the function.
 
-Note the outputted S3 Bucket Name.
+Note the names of outputted S3 Buckets.
 
 ## Invoke the Lambda function
-You can now invoke the Lambda function. Amend the Region and use the following command:
+
+You can now invoke the Lambda function. 
+Navigate to the AWS Lambda console and find the Amend the Region and use the following command:
 ```bash
 aws lambda invoke \
  --function-name "logs-extension-demo-function" \
