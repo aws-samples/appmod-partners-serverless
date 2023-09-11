@@ -49,26 +49,25 @@ Note the names of outputted S3 Buckets.
 ## Invoke the Lambda function
 
 You can now invoke the Lambda function. 
-Navigate to the AWS Lambda console and find the Amend the Region and use the following command:
+Navigate to the [AWS Lambda console](https://console.aws.amazon.com/lambda) and find the Lambda function **logs-extension-demo-function**. Scroll down and find the Test button. Click on Test and create the following test event
+
 ```bash
-aws lambda invoke \
- --function-name "logs-extension-demo-function" \
- --payload '{"payload": "hello"}' /tmp/invoke-result \
- --cli-binary-format raw-in-base64-out \
- --log-type Tail \
- --region <use your Region>
+{
+  "key": "failure"
+}
 ```
-The function should return `"StatusCode": 200`
 
-Browse to the [Amazon CloudWatch Console](https://console.aws.amazon.com/cloudwatch). Navigate to *Logs\Log Groups*. Select the log group **/aws/lambda/logs-extension-demo-function**.
+Click on Save and invoke the function a few times. The function should return an error. For successful invocations of the function, simply replace the key value in the test event with "success" as follows:
+```bash
+{
+  "key": "success"
+}
+```
 
-View the log stream to see the platform, function, and extensions each logging while they are processing.
 
-The logging extension also receives the log stream directly from Lambda, and copies the logs to S3.
+Browse to the [Amazon S3 Console](https://console.aws.amazon.com/S3). You will find 2 buckets created, one with the name **successlogextensionsbucket** and another with **failedlogextensionsbucket**. Navigate to the **failedlogextensionsbucket** S3 bucket. 
 
-Browse to the [Amazon S3 Console](https://console.aws.amazon.com/S3). Navigate to the S3 bucket created as part of the SAM deployment. 
+Download the file object containing the copied log stream. The log contains the function logs with the respective function errors.
 
-Downloading the file object containing the copied log stream. The log contains the same platform and function logs, but not the extension logs, as specified during the subscription.
-
-If you receive a `permission denied Extension.LaunchError` in the logs, the extension does not have the neccesary permissions.
+Note: If you receive a `permission denied Extension.LaunchError` in the logs, the extension does not have the neccesary permissions.
 Run `chmod +x logs_api_http_extension.py` and build and deploy the AWS SAM application again.
