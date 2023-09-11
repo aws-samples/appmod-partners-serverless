@@ -8,6 +8,7 @@ Please see the following list for the demos you can test:
 - [Java on AWS Lambda](lambda-java-calculator/README.md)
 - [Api Gateway](api_gateway_demo/README.md)
 - [Serverless Data Processing](serverless-data-processing/README.md)
+- [Lambda Extensions Demo](https://github.com/aws-samples/appmod-partners-serverless/tree/lambda-extensions-demo/lambda-extensions-demo)
 
 ## Security
 
