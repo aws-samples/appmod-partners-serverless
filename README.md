@@ -11,6 +11,10 @@ Please see the following list for the demos you can test:
 - [Serverless Data Processing](serverless-data-processing/README.md)
 - [Lambda Extensions Demo](https://github.com/aws-samples/appmod-partners-serverless/tree/lambda-extensions-demo/lambda-extensions-demo)
 
+## Disclaimer
+
+The repository is a collection of sample patterns, and are not meant to be deployed in a production-grade environment.
+
 ## Security
 
 See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
