@@ -1,6 +1,6 @@
 # Serverless Microservice
 
-This is a sample serverless microservice built using AWS API Gateway, AWS Lambda, and AWS DynamoDB, all provisioned and managed using Terraform.
+This is a sample serverless microservice built using Amazon API Gateway, AWS Lambda, and Amazon DynamoDB, all provisioned and managed using Terraform.
 
 ## Architecture
 
