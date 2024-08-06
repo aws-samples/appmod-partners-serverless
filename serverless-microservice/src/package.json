@@ -1,0 +1,15 @@
+{
+  "name": "microservice",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tgpadua",
+  "license": "MIT-0",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.529.0",
+    "@aws-sdk/util-dynamodb": "^3.564.0"
+  }
+}

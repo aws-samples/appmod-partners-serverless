@@ -4,11 +4,16 @@ This is a repository to show a set of demo projects showcasing various Serverles
 
 Please see the following list for the demos you can test:
 
+- [Serverless Microservice](serverless-microservice/README.md)
 - [Event-driven Architecture on AWS](event-driven-architecture/README.md)
 - [Java on AWS Lambda](lambda-java-calculator/README.md)
 - [Api Gateway](api_gateway_demo/README.md)
 - [Serverless Data Processing](serverless-data-processing/README.md)
 - [Lambda Extensions Demo](https://github.com/aws-samples/appmod-partners-serverless/tree/lambda-extensions-demo/lambda-extensions-demo)
+
+## Disclaimer
+
+The repository is a collection of sample patterns, and are not meant to be deployed in a production-grade environment.
 
 ## Security
 
