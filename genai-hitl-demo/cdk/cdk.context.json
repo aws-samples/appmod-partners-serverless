@@ -1,0 +1,8 @@
+{
+  "params": {
+    "SQS_ESM_CONCURRENCY":4
+  },
+  "acknowledged-issue-numbers": [
+    19836
+  ]
+}
