@@ -3,25 +3,34 @@
 This is a sample application to demonstrate prompt chaining with human in the loop. Prompt chaining is a technique of decomposing complex prompts to simpler prompts and wiring multiple simpler prompts and prompt responses as a sequence of steps to achieve a business operation.
 
 ### Solution overview
-Consider a video streaming application such as [ServerlessVideo](https://serverlessland.com/explore/serverlessvideo). The sample application allows video authors to create title, description and custom avatar for the video using Generative AI foundation models. Steps involved are.
+Consider a video streaming application such as [ServerlessVideo](https://serverlessland.com/explore/serverlessvideo). The sample application allows video authors to create title, description and custom avatar for the video using Generative AI foundation models. Steps involved are:
 1. Transcribes provided video to text.
-2. Creates title and description using two foundations models
+2. Creates title and description using two foundation models
 3. Sends the generated title and description to the video author to choose one and waits for the video author to respond
 4. As the video author responds with the selected title, it generates an avatar
-5. Generates a custom avatar avatar as a S3 pre-signed url
+5. Generates a custom avatar as a S3 pre-signed url
 
 Solution decomposes generation and selection of title, description and avatar to simpler prompts by first generating the title and description. This showcases how prompt chaining can be used with Step Functions.
 
 ![app](app.png)
 
 ### Deploy
-Make sure your account is [enabled to access](https://console.aws.amazon.com/bedrock/home?#/modelaccess) Amazon Bedrock models anthropic-claude-v2 and anthropic.claude-v2:1
+Make sure your account is [enabled to access](https://console.aws.amazon.com/bedrock/home?#/modelaccess) Amazon Bedrock models anthropic-claude-v2, anthropic.claude-v2:1 and stability.stable-diffusion-xl-v1.
 
-1. Deploy the stack
-```bash
-cd cdk
-cdk deploy --all
-```
+1. Access the CDK folder
+   ```bash
+   cd cdk
+   ```
+
+2. Install the dependencies
+   ```bash
+   npm install
+   ```
+
+3. Deploy the stack
+   ```bash
+   cdk deploy --all
+   ```
 
 ### Testing
 
