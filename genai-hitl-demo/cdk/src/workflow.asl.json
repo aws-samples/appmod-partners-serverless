@@ -1,0 +1,255 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "StartTranscriptionJob",
+  "States": {
+    "StartTranscriptionJob": {
+      "Type": "Task",
+      "Parameters": {
+        "Media": {
+          "MediaFileUri.$": "States.Format('s3://${bucket}/{}',$.input.key)"
+        },
+        "TranscriptionJobName.$": "States.Format('${TranscriptionJob}_{}',$$.Execution.Name)",
+        "OutputBucketName": "${bucket}",
+        "OutputKey.$": "States.Format('output/{}.json',$.input.key)",
+        "LanguageCode": "en-US"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:startTranscriptionJob",
+      "Next": "GetTranscriptionJob",
+      "ResultPath": "$.TranscriptionJob",
+      "ResultSelector": {
+        "TranscriptionJobName.$": "$.TranscriptionJob.TranscriptionJobName"
+      }
+    },
+    "GetTranscriptionJob": {
+      "Type": "Task",
+      "Parameters": {
+        "TranscriptionJobName.$": "$.TranscriptionJob.TranscriptionJobName"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:transcribe:getTranscriptionJob",
+      "ResultSelector": {
+        "TranscriptionJobName.$": "$.TranscriptionJob.TranscriptionJobName",
+        "Transcript.$": "$.TranscriptionJob.Transcript",
+        "TranscriptionJobStatus.$": "$.TranscriptionJob.TranscriptionJobStatus"
+      },
+      "ResultPath": "$.TranscriptionJob",
+      "Next": "Choice"
+    },
+    "Choice": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "COMPLETED",
+          "Next": "Read Transcript"
+        },
+        {
+          "Variable": "$.TranscriptionJob.TranscriptionJobStatus",
+          "StringEquals": "FAILED",
+          "Next": "Fail"
+        }
+      ],
+      "Default": "Wait"
+    },
+    "Read Transcript": {
+      "Type": "Task",
+      "Next": "Pass",
+      "Parameters": {
+        "Bucket": "${bucket}",
+        "Key.$": "States.Format('output/{}.json',$.input.key)"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:getObject",
+      "ResultSelector": {
+        "Content.$": "States.StringToJson($.Body)"
+      },
+      "ResultPath": "$.S3Content"
+    },
+    "Pass": {
+      "Type": "Pass",
+      "Next": "Parallel",
+      "Parameters": {
+        "input.$": "$.input",
+        "TranscriptionJob.$": "$.TranscriptionJob",
+        "Payload.$": "$.S3Content.Content.results.transcripts[0]",
+        "seed.$": "States.MathRandom(10000000, 99999999)"
+      }
+    },
+    "Parallel": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "create Bedrock prompt 1",
+          "States": {
+            "create Bedrock prompt 1": {
+              "Type": "Pass",
+              "Next": "Bedrock InvokeModel 1",
+              "Parameters": {
+                "prompt.$": "States.Format('Human:You will create a title and description for the provided video transcript. Transcript:\n{}  \n\n Your response should be formatted as a JSONObject as follows. \\{\"title\":\"title\", \"description\":\"description of the video\"\\} Do not add \"here is a generated ..\" Assistant:', $.Payload.transcript)"
+              }
+            },
+            "Bedrock InvokeModel 1": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::bedrock:invokeModel",
+              "Parameters": {
+                "ModelId": "arn:aws:bedrock:${region}::foundation-model/anthropic.claude-v2",
+                "Body": {
+                  "prompt.$": "$.prompt",
+                  "max_tokens_to_sample": 200
+                }
+              },
+              "ResultSelector": {
+                "model_response.$": "$.Body.completion",
+                "model": "anthropic.claude-v2"
+              },
+              "ResultPath": "$.Bedrock",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "create Bedrock prompt 2",
+          "States": {
+            "create Bedrock prompt 2": {
+              "Type": "Pass",
+              "Parameters": {
+                "prompt.$": "States.Format('Human:You will create a title and description for the provided video transcript. Transcript:\n{}  \n\n Your response should be formatted as a JSONObject as follows. \\{\"title\":\"title\", \"description\":\"description of the video\"\\} Do not add \"here is a generated ..\" Assistant:', $.Payload.transcript)"
+              },
+              "Next": "Bedrock InvokeModel 2"
+            },
+            "Bedrock InvokeModel 2": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::bedrock:invokeModel",
+              "Parameters": {
+                "ModelId": "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2:1",
+                "Body": {
+                  "prompt.$": "$.prompt",
+                  "max_tokens_to_sample": 200
+                }
+              },
+              "End": true,
+              "ResultSelector": {
+                "model_response.$": "$.Body.completion",
+                "model": "anthropic.claude-v2.1"
+              },
+              "ResultPath": "$.Bedrock"
+            }
+          }
+        }
+      ],
+      "Next": "Wait for user feedback",
+      "ResultPath": "$.parallel"
+    },
+    "Wait for user feedback": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "${send_response_lambda}",
+        "Payload": {
+          "type": "message",
+          "input.$": "$.input",
+          "response_payload.$": "$.parallel",
+          "taskToken.$": "$$.Task.Token"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Choose the title and Description",
+      "ResultPath": "$.UserInput"
+    },
+    "Choose the title and Description": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.UserInput.approved",
+              "StringEquals": "no"
+            },
+            {
+              "Variable": "$.UserInput.message",
+              "StringEquals": "regenerate"
+            }
+          ],
+          "Next": "Read Transcript"
+        }
+      ],
+      "Default": "Generate Avatar"
+    },
+    "Generate Avatar": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "arn:aws:bedrock:us-east-1::foundation-model/stability.stable-diffusion-xl-v1",
+        "Body": {
+          "text_prompts": [
+            {
+              "text": "Executive profile picture of Jeff Bezos twin, plain background, centered composition, low-poly, poly-hd, 3d, low-poly game art, polygon mesh, blocky, wireframe edges, colorful, fine details, 4k resolution",
+              "weight": 1
+            },
+            {
+              "text": "multiple avatars",
+              "weight": -1
+            }
+          ],
+          "cfg_scale": 20,
+          "steps": 35,
+          "seed.$": "$.seed",
+          "width": 512,
+          "height": 512,
+          "samples": 1
+        },
+        "Output": {
+          "S3Uri.$": "States.Format('s3://${bucket}/avatar/{}.png', $.input.key)"
+        },
+        "Accept": "image/png"
+      },
+      "Next": "send custom avatar to user",
+      "ResultPath": "$.avatar_result"
+    },
+    "send custom avatar to user": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload": {
+          "type": "avatar",
+          "input.$": "$.input",
+          "avatar_uri.$": "$.avatar_result.Body"
+        },
+        "FunctionName":"${send_response_lambda}"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "GetTranscriptionJob"
+    },
+    "Fail": {
+      "Type": "Fail"
+    }
+  }
+}

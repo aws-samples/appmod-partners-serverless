@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <title>AWS Generative AI</title>
+    <style>
+        .hiddenOnLoad {
+            display: none;
+        }
+        .display {
+            display:"";
+        }
+        table, th, td {
+            /*border: 1px solid;*/
+            padding: 5px;
+        }
+        table tr:nth-child(even){background-color: #f2f2f2;}
+        a.disabled {
+            pointer-events: none;
+            cursor: default;
+            color: gray;
+        }
+    </style>
+</head>
+
+<body class="container">
+    <h1>AWS Generative AI</h1>
+    <hr />
+    <div id="configPane" class="hiddenOnLoad">
+        <h2>Configuration</h2>
+        <form>
+            <div class="form-group">
+                <input type="password" class="form-control form-control-sm" id="wssServerUrl"
+                    placeholder="IoT Core URL, e.g. wss://a14tzzzzbjeq12-ats.iot.us-east-1.amazonaws.com">
+                <input type="password" class="form-control form-control-sm" id="wssClientId"
+                    placeholder="ClientId (any string)">
+                <input type="password" class="form-control form-control-sm" id="wssAuthorizerName"
+                    placeholder="Authorizer name">
+                <input type="password" class="form-control form-control-sm" id="token"
+                    placeholder="">
+
+            </div>
+            <a class="btn btn-primary btn-sm" id="connectButton">Connect</a>
+        </form>
+    </div>
+    <div id="waitPane" class="hiddenOnLoad">
+        <i>Waiting...</i>
+    </div>
+    <div id="controlsPane" class="hiddenOnLoad">
+        <form>
+           <div id="generate_content">
+             <video src="bezos-vogels.mp4" height="450" controls></video><br/><br/>
+             <a class="btn btn-primary btn-sm" id="GenerateButton">Generate title, description</a>
+             <input type="password" class="form-control form-control-sm" id="prompt" placeholder="" value="filename" style="display:none;">
+            </div>
+        </form>
+    </div>
+    <div id="messagesPane" class="hiddenOnLoad">
+        <table>
+         <tr>
+            <th>Model</th>
+            <th><b>
+            <div id="bedrock_model1"></b>
+            </div>
+            </th>
+            <th></b>
+            <div id="bedrock_model2"></b>
+            </th>
+            </div>
+        </tr>
+        <tr >
+            <td> <b>Title</b> </td>
+            <td>
+            <div id="bedrock_title1">
+            </div>
+            </td>
+            <td>
+            <div id="bedrock_title2">
+            </td>
+            </div>
+        </tr>
+        <tr >
+            <td> <b>Descripion</b> </td>
+            <td>
+            <div id="bedrock_desc1">
+            </div>
+            </td>
+            <td>
+            <div id="bedrock_desc2">
+            </td>
+            </div>
+        </tr>
+        <tr>
+            <td>
+                <a class="btn btn-primary btn-sm" id="NoButton">Regenerate</a>
+            </td>
+            <td>
+                <a class="btn btn-primary btn-sm" id="BedrockButton1">Select</a>
+            </div>
+            </td>
+            <td>
+                <a class="btn btn-primary btn-sm" id="BedrockButton2">Select</a>
+            </td>
+            </div>
+        </tr>
+        </table>
+    </div>
+    <div id="resultPane" class="hiddenOnLoad">
+        <table>
+        <tr>
+            <td>
+                <img id="avatar" src=""/>
+            </td>
+            <td>
+                <h2><div id="result_title"></div></h2>
+                <div id="result_description"></div>
+            </td>
+        </tr>
+        <table>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script src="script.js"></script>
+    <script type="text/javascript" src="jsonpath.js"></script>
+</body>
+</html>
