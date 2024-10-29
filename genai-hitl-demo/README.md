@@ -12,6 +12,11 @@ Consider a video streaming application such as [ServerlessVideo](https://serverl
 
 Solution decomposes generation and selection of title, description and avatar to simpler prompts by first generating the title and description. This showcases how prompt chaining can be used with Step Functions.
 
+#### Architecture
+
+![Architecture](architecture.svg)
+
+#### Preview
 ![app](app.png)
 
 ### Deploy
