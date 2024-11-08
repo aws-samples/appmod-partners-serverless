@@ -1,5 +1,5 @@
 // config
-const WEBSOCKET_URL = 'wss://ajdlvwqdok.execute-api.us-east-1.amazonaws.com/prod';
+const WEBSOCKET_URL = 'REPLACE_ME_WITH_API_GATEWAY_ENDPOINT_OUTPUT';
 
 // backend constants
 const WEBSOCKET_IMAGE_ACTION_KEY = 'image';
