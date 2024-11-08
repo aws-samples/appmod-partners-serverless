@@ -1,0 +1,78 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "Bedrock InvokeModel",
+  "States": {
+    "Bedrock InvokeModel": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::bedrock:invokeModel",
+      "Parameters": {
+        "ModelId": "arn:aws:bedrock:us-east-1::foundation-model/${bedrock_model_id}",
+        "Body": {
+          "anthropic_version": "bedrock-2023-05-31",
+          "max_tokens": 500,
+          "messages": [
+            {
+              "role": "user",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Recommend 3 tourist places similar to the image provided"
+                },
+                {
+                  "type": "image",
+                  "source": {
+                    "type": "base64",
+                    "media_type.$": "$.body.message.type",
+                    "data.$": "$.body.message.data"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "Next": "Reply Client",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Bedrock.ThrottlingException"
+          ],
+          "BackoffRate": 2,
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3
+        }
+      ],
+      "ResultPath": "$.bedrock",
+      "ResultSelector": {
+        "data.$": "$.Body.content[0].text"
+      }
+    },
+    "Reply Client": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${reply_client_function_name}",
+        "Payload": {
+          "connectionId.$": "$.connectionId",
+          "action.$": "$.body.action",
+          "data.$": "$.bedrock.data"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 1,
+          "MaxAttempts": 3,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    }
+  }
+}

@@ -1,0 +1,8 @@
+I need a single page application written in HTML and JavaScript for a ChatBot application. These are the requirements...
+1. It will be using WSS (websockets) to interact with the backend
+2. To start the chat the user should be able to drag and drop an image
+3. The image dropped should be displayed in the drop area
+4. The user prompt will only be enabled after the image is sent to the backend and response received
+5. The user can type a new message but not send it before receive a response to his previous message
+6. While waiting for a response a processing message should be displayed
+7. Don't use any JavaScript framework, only vanilla functions

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatBot Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="drop-area">
+    <p id="drop-area-label">
+        Where do you want to travel? <br/><br/>
+        Drag and drop an image here to start the chat
+    </p>
+    <img id="preview">
+</div>
+<div id="chat-area">
+    <div id="messages"></div>
+    <div id="loader-container">
+        <pre id="loader"></pre>
+    </div>
+    <input type="text" id="user-input" placeholder="Type your message..." disabled>
+    <button id="send-btn" disabled>Send</button>
+</div>
+<br/><br/>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+html {
+    background: #211f1f;
+    color: #D9D9D9;
+}
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+}
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 15px 10px;
+}
+pre.client-message {
+    background: #3d3b3b;
+}
+#drop-area {
+    width: 700px;
+    min-height: 100px;
+    border: 2px dashed #ccc;
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+}
+#drop-area.highlight {
+    border-color: blue;
+}
+#preview {
+    display: none;
+    max-height: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+#chat-area {
+    width: 768px;
+    margin: 0 auto;
+}
+#user-input {
+    width: 80%;
+    padding: 5px;
+    color: #D9D9D9;
+    background: #3d3b3b;
+}
+#send-btn {
+    padding: 5px 10px;
+}
+#loader-container {
+    padding-left: 20px;
+}
+#loader {
+    /* source: https://css-loaders.com/progress/ */
+    display: none;
+    padding: 0;
+    width: 15px;
+    aspect-ratio: 1;
+    animation: l5 1s infinite linear alternate;
+}
+@keyframes l5 {
+    0%  {box-shadow: 20px 0 #c4c4c4, -20px 0 #262121;background: #c4c4c4 }
+    33% {box-shadow: 20px 0 #c4c4c4, -20px 0 #262121;background: #262121}
+    66% {box-shadow: 20px 0 #262121,-20px 0 #c4c4c4; background: #262121}
+    100%{box-shadow: 20px 0 #262121,-20px 0 #c4c4c4; background: #c4c4c4 }
+}
