@@ -3,7 +3,7 @@
 This is a repository to show a set of demo projects showcasing various Serverless patterns using AWS Serverless services. 
 
 Please see the following list for the demos you can test:
-
+- [Generative AI Travel Agent Demo](genai-travel-agent-demo)
 - [Generative AI Human in the Loop (HITL) Demo](genai-hitl-demo)
 - [Serverless Microservice](serverless-microservice/README.md)
 - [Event-driven Architecture on AWS](event-driven-architecture/README.md)
