@@ -1,13 +1,11 @@
-# Provider configuration
-provider "aws" {
-  region = var.aws_region
+variable "aws_region" {
+  type = string
+  description = "AWS region"
+  default = "us-east-1"
 }
 
-# Variables
-variable "aws_region" {
-  description = "The AWS region to deploy resources"
-  type        = string
-  default     = "us-east-1"
+provider "aws" {
+  region = var.aws_region
 }
 
 variable "model_id" {
