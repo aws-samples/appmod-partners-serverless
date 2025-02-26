@@ -8,10 +8,18 @@ provider "aws" {
   region = var.aws_region
 }
 
-variable "model_id" {
-  description = "The ARN of the Bedrock model to use"
-  type        = string
-  default     = "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2:1"
+variable "model_base_arn" {
+  type    = string
+  default = "arn:aws:bedrock"
+}
+
+variable "model_suffix" {
+  type    = string
+  default = "::foundation-model/anthropic.claude-v2:1"
+}
+
+locals {
+  model_id = "${var.model_base_arn}:${var.aws_region}${var.model_suffix}"
 }
 
 # Resources
@@ -75,7 +83,7 @@ resource "aws_iam_role_policy" "bedrock_access" {
         Action = [
           "bedrock:InvokeModel"
         ]
-        Resource = var.model_id
+        Resource = local.model_id
       }
     ]
   })
@@ -93,7 +101,7 @@ resource "aws_sfn_state_machine" "bedrock_integration" {
         Type     = "Task"
         Resource = "arn:aws:states:::bedrock:invokeModel"
         Parameters = {
-          ModelId = var.model_id
+          ModelId = local.model_id
           Body = {
             "prompt.$"           = "$.prompt"
             max_tokens_to_sample = 200
