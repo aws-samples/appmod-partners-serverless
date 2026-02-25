@@ -9,6 +9,6 @@
   "license": "MIT-0",
   "description": "",
   "devDependencies": {
-    "@aws-sdk/client-bedrock-agent-runtime": "^3.682.0"
+    "@aws-sdk/client-bedrock-agent-runtime": "^3.996.0"
   }
 }
